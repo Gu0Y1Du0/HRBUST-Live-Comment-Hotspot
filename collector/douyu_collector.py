@@ -22,7 +22,7 @@ logger = logging.getLogger("douyu-collector")
 
 # 弹幕抓取
 def chatmsg_handler(msg):
-    danmuku = {
+    danmaku = {
         "platform": "douyu",
         "room_id": room_id,
         "user": {
@@ -30,17 +30,17 @@ def chatmsg_handler(msg):
             "name": msg["nn"],
         },
         "content": msg["txt"],
-        "event_type": "danmuku",
+        "event_type": "danmaku",
         "ts": int(time.time() * 1000),
     }
     print(danmuku)
     sys.stdout.flush()
 
-    send_to_kafka(room_id=room_id, message=danmuku)
+    send_to_kafka(room_id=room_id, message=danmaku)
 
 # 队列CONFIG
 KAFKA_BROKERS=["localhost:9092"]
-TOPIC_NAME= f"danmuku_row"
+TOPIC_NAME= f"danmaku_row"
 # 弹幕上传
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKERS,
