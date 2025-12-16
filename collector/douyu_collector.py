@@ -40,7 +40,7 @@ def chatmsg_handler(msg):
 
 # 队列CONFIG
 KAFKA_BROKERS=["localhost:9092"]
-TOPIC_NAME= f"douyu_{room_id}"
+TOPIC_NAME= f"danmuku_row"
 # 弹幕上传
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKERS,
@@ -51,7 +51,7 @@ producer = KafkaProducer(
 
 def send_to_kafka(room_id, message: dict):
     future = producer.send(
-        topic = TOPIC_NAME,
+            topic = TOPIC_NAME,
         key = str(room_id).encode('utf-8'),
         value = message
     )
