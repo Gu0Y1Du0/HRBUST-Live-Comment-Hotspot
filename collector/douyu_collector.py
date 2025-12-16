@@ -5,7 +5,6 @@ import sys
 import time
 import json
 import logging
-import asyncio
 
 # 弹幕CONFIG
 ROOM_IDS = {
@@ -41,7 +40,7 @@ def chatmsg_handler(msg):
 
 # 队列CONFIG
 KAFKA_BROKERS=["localhost:9092"]
-TOPIC_NAME= str(room_id)
+TOPIC_NAME= f"douyu_{room_id}"
 # 弹幕上传
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKERS,
