@@ -33,7 +33,7 @@ def chatmsg_handler(msg):
         "event_type": "danmaku",
         "ts": int(time.time() * 1000),
     }
-    print(danmuku)
+    print(danmaku)
     sys.stdout.flush()
 
     send_to_kafka(room_id=room_id, message=danmaku)
