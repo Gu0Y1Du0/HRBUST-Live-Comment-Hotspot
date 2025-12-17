@@ -24,13 +24,14 @@ producer = KafkaProducer(
 
 # 绑定个人用户账号
 credential = Credential(
-    sessdata="c217a9e9%2C1781153347%2C34d30%2Ac2CjCMNwJ5hg7UUMFflI2Mqjuug9tfT5k624acMwW1N-ZHVWHi6FexEStm6kDaVgg1jvYSVjhIeGlLNkRKN2VNSGo4UkoxUThFZTQzaGYtQjNLc2tPTEV5SElBSTdkYnRBbGJ0RnVDdVJLNmRnTzQzaExCNTdRdXAzemFsVzlyQnpROGZHRWNXRWhBIIEC",
-    bili_jct="24c792def0ae504184f5ac7486023991",
+    sessdata="2ab001ae%2C1781428479%2Ca1f40%2Ac2CjDrF1luymxc3DaCiDjAIYtjEqk1zeQPaxX-SN31BWuLwWaOhOadKDDha0QeZAgAVxQSVm55SlNXOWtQWHprdXBLMEhDYXJNS1J2YjlpTFVXMXZmalp2aDB4SmE2cWVQMXdZYlVlaUZyUllMeWFSQjVyd2UtZVdHVVE2c1ZsZVhfckctZlQ3RUhBIIEC",
+    bili_jct="3f448aa896da3f6d52b2b33d7baabcbb",
     buvid3="F7BB05CB-168D-25CE-8E14-5B09DFE6FB9783427infoc",
 )
 
 # 房间ID
-room_id = 21514463
+room_id = 732
+# room_id = 923833
 
 # 初始化直播弹幕服务
 room = live.LiveDanmaku(room_display_id=room_id, credential=credential)
