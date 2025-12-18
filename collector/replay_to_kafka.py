@@ -6,7 +6,7 @@ from kafka import KafkaProducer
 KAFKA_BOOTSTRAP_SERVERS = ["hadoop01:9092"]
 TOPIC_NAME = "danmaku_raw"
 JSON_FILE_PATH = "video_danmaku.json"
-SPEED = 20.0
+SPEED = 2.0
 
 
 def replay():

@@ -38,7 +38,13 @@ def run_bridge():
         count = data.get("count")
 
         # 获取当前处理时间 (作为图表的 X 轴)
-        current_ts = int(time.time() * 1000)
+        # current_ts = int(time.time() * 1000)
+        # 当前时间使用Kafka打上的时间戳，如果使用现在的时间戳会导致时间错误
+        current_ts = message.timestamp
+
+        # 如果kafka没打上时间戳才用现在的时间
+        if current_ts is None:
+            current_ts = int(time.time() * 1000)
 
         # --- 写入 Redis 逻辑 ---
 
