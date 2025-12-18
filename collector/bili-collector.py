@@ -4,6 +4,8 @@ import time
 import json
 import asyncio
 import logging
+import argparse
+import sys
 
 from kafka.errors import KafkaError
 
@@ -29,8 +31,28 @@ credential = Credential(
     buvid3="F7BB05CB-168D-25CE-8E14-5B09DFE6FB9783427infoc",
 )
 
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Bilibili Live Collector")
+    # 定义需要接受的参数
+    parser.add_argument(
+        "--room-id", type=int, required=True, help="直播间ID(长号短号都可以)"
+    )
+
+    return parser.parse_args()
+
+
+# 获取参数
+try:
+    args = get_args()
+    room_id = args.room_id
+    logger.info(f"正在启动直播间监控，目标房间: {room_id}")
+except Exception as e:
+    logger.error(f"参数解析失败: {e}")
+    sys.exit(1)
+
 # 房间ID
-room_id = 732
+# room_id = 732
 # room_id = 923833
 
 # 初始化直播弹幕服务
