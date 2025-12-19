@@ -18,8 +18,8 @@ export const getRank = () => api.get('/api/live/rank');
 export const getHistory = (roomId: string) => api.get(`/api/live/history/${roomId}`);
 
 // 启动直播监控
-export const startLiveTask = (roomId: string) =>
-    api.post('/api/live/monitor/start', { room_id: roomId });
+export const startLiveTask = (roomId: string, platform: string) =>
+    api.post('/api/live/monitor/start', { room_id: roomId, platform: platform });
 
 // 启动视频分析
 export const startVideoTask = (bvId: string) =>
