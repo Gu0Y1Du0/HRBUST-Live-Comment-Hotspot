@@ -29,7 +29,7 @@ def analylze_video(request: VideoAnalyzeRequest):
 # 获取当前监控房间的榜单
 @router.get("/rank", response_model=List[RankItem])
 def get_rank(r: redis.Redis = Depends(get_redis)):
-    return LiveService.get_top_rooms
+    return LiveService.get_top_rooms(r)
 
 
 # 获取当前房间的历史流数据
