@@ -1,122 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Typography, List, Badge, Row, Col, Statistic, Card } from 'antd';
-import { FireOutlined, LineChartOutlined, DashboardOutlined } from '@ant-design/icons';
-
-// 引入我们拆分好的组件
-import MonitorChart from './components/MonitorChart';
-import TaskControl from './components/TaskControl';
-// 引入 API
-import { getRank, getHistory } from './api';
-
-const { Header, Content, Sider } = Layout;
-const { Title, Text } = Typography;
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import Dashboard from './pages/Dashboard';
+import PlatformMonitor from './pages/PlatformMonitor';
 
 const App: React.FC = () => {
-  // 状态管理
-  const [rankList, setRankList] = useState<any[]>([]);
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
-  const [chartData, setChartData] = useState<any[]>([]);
-
-  // 数据轮询
-  // 获取排行榜
-  useEffect(() => {
-    const fetchRank = async () => {
-      try {
-        const res = await getRank();
-        setRankList(res.data);
-        // 如果没人选，默认选第一名
-        if (!selectedRoomId && res.data.length > 0) {
-          setSelectedRoomId(res.data[0].room_id);
-        }
-      } catch (e) { console.error(e); }
-    };
-    fetchRank();
-    const timer = setInterval(fetchRank, 2000);
-    return () => clearInterval(timer);
-  }, [selectedRoomId]);
-
-  // 获取图表数据
-  useEffect(() => {
-    if (!selectedRoomId) return;
-    const fetchHistory = async () => {
-      try {
-        const res = await getHistory(selectedRoomId);
-        setChartData(res.data.data);
-      } catch (e) { console.error(e); }
-    };
-    fetchHistory();
-    const timer = setInterval(fetchHistory, 2000);
-    return () => clearInterval(timer);
-  }, [selectedRoomId]);
-
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      {/* 顶部导航 */}
-      <Header style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #333', padding: '0 24px' }}>
-        <DashboardOutlined style={{ fontSize: '24px', color: '#1890ff', marginRight: 12 }} />
-        <Title level={3} style={{ color: '#fff', margin: 0 }}>HRBUST 舆情监控中台</Title>
-      </Header>
+    <BrowserRouter>
+      <Routes>
+        {/* 使用 Layout 包裹所有页面 */}
+        <Route path="/" element={<MainLayout />}>
 
-      <Layout>
-        {/* 左侧：实时热榜 (代码逻辑简单，直接留在这里，或者也拆成组件) */}
-        <Sider width={320} style={{ borderRight: '1px solid #333', overflow: 'auto', background: '#000' }}>
-          <div style={{ padding: '16px' }}>
-            <Title level={5} style={{ color: '#aaa', marginBottom: 16 }}>🔥 活跃频道 / 任务</Title>
-            <List
-              dataSource={rankList}
-              renderItem={(item, index) => (
-                <List.Item
-                  onClick={() => setSelectedRoomId(item.room_id)}
-                  style={{
-                    cursor: 'pointer',
-                    backgroundColor: selectedRoomId === item.room_id ? '#1f1f1f' : 'transparent',
-                    padding: '12px', borderRadius: '6px', marginBottom: '8px', border: 'none'
-                  }}
-                >
-                  <div style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-                    <Badge count={index + 1} style={{ backgroundColor: index < 3 ? '#1890ff' : '#555', boxShadow: 'none' }} />
-                    <span style={{ marginLeft: 12, flex: 1, color: '#fff', fontWeight: 'bold' }}>
-                      {item.room_id.startsWith('BV') ? `📹 视频 ${item.room_id}` : `🔴 直播 ${item.room_id}`}
-                    </span>
-                    <Text type="secondary" style={{ color: '#faad14' }}>{item.heat}</Text>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </div>
-        </Sider>
+          {/* 首页 */}
+          <Route index element={<Dashboard />} />
 
-        {/* 右侧：主内容区 */}
-        <Content style={{ padding: '24px', overflowY: 'auto' }}>
+          {/* B站：有直播 + 有视频 */}
+          <Route path="bilibili" element={
+            <PlatformMonitor platformName="Bilibili" enableVideo={true} />
+          } />
 
-          {/* 顶部：任务控制台 (新加的！) */}
-          <TaskControl />
+          {/* 抖音：有直播 + 有视频 */}
+          <Route path="douyin" element={
+            <PlatformMonitor platformName="Douyin" enableVideo={true} />
+          } />
 
-          {/* 中部：核心指标 */}
-          <Row gutter={16} style={{ marginBottom: 20 }}>
-            <Col span={6}>
-              <Card bordered={false} style={{ background: '#1f1f1f' }}>
-                <Statistic title="当前选中对象" value={selectedRoomId || 'None'} valueStyle={{ color: '#1890ff', fontSize: '18px' }} />
-              </Card>
-            </Col>
-            <Col span={6}>
-              <Card bordered={false} style={{ background: '#1f1f1f' }}>
-                <Statistic
-                  title="当前热度峰值"
-                  value={chartData.length > 0 ? chartData[chartData.length - 1].value : 0}
-                  prefix={<FireOutlined />}
-                  valueStyle={{ color: '#cf1322' }}
-                />
-              </Card>
-            </Col>
-          </Row>
+          {/* 斗鱼：只有直播 (enableVideo=false) */}
+          <Route path="douyu" element={
+            <PlatformMonitor platformName="Douyu" enableVideo={false} />
+          } />
 
-          {/* 底部：大图表 */}
-          <MonitorChart roomId={selectedRoomId} data={chartData} />
+          {/* 404 跳转 */}
+          <Route path="*" element={<Navigate to="/" replace />} />
 
-        </Content>
-      </Layout>
-    </Layout>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

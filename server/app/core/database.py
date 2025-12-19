@@ -3,7 +3,7 @@ from app.core.config import settings
 
 # 创建连接池
 pool = redis.ConnectionPool(
-    host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_response=True
+    host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True
 )
 
 

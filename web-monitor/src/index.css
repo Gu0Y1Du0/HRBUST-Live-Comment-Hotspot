@@ -7,3 +7,19 @@ body {
   /* min-width: 320px; */
   /* min-height: 100vh; */
 }
+
+/*自定义滚动条，让它变细变黑*/
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
