@@ -16,14 +16,10 @@ class LiveMonitorRequest(BaseModel):
 
 # 开始监控直播状态
 @router.post("/monitor/start")
-def start_live_monitoring(request: LiveMonitorRequest):
-    return TaskService.start_live_monitor(request.room_id)
-
-
-# 开始监控视频重播状态，默认五倍速
-@router.post("/analyze")
-def analylze_video(request: VideoAnalyzeRequest):
-    return TaskService.start_video_replay(request.bv_id)
+def start_live_monitoring(
+    request: LiveMonitorRequest, r: redis.Redis = Depends(get_redis)
+):
+    return TaskService.start_live_monitor(request.room_id, r)
 
 
 # 获取当前监控房间的榜单

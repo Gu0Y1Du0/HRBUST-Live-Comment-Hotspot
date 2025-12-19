@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import live
+from app.api.v1.endpoints import live, video
 
 app = FastAPI(title="HRBUST Data Monitor")
 
@@ -14,7 +14,10 @@ app.add_middleware(
 )
 
 # 注册路由
+# 直播路由
 app.include_router(live.router, prefix="/api/live", tags=["直播监控"])
+# 视频路由
+app.include_router(video.router, prefix="/api/video", tags=["视频重播"])
 
 
 @app.get("/")
