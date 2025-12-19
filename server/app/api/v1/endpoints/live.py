@@ -5,13 +5,14 @@ from typing import List
 from app.core.database import get_redis
 from app.services.live_service import LiveService
 from app.services.task_service import TaskService
-from app.schemas.monitor import RankItem, HistoryResponse, VideoAnalyzeRequest
+from app.schemas.monitor import (
+    RankItem,
+    HistoryResponse,
+    VideoAnalyzeRequest,
+    LiveMonitorRequest,
+)
 
 router = APIRouter()
-
-
-class LiveMonitorRequest(BaseModel):
-    room_id: str
 
 
 # 开始监控直播状态
@@ -19,7 +20,7 @@ class LiveMonitorRequest(BaseModel):
 def start_live_monitoring(
     request: LiveMonitorRequest, r: redis.Redis = Depends(get_redis)
 ):
-    return TaskService.start_live_monitor(request.room_id, r)
+    return TaskService.start_live_monitor(request.room_id, request.platform, r)
 
 
 # 获取当前监控房间的榜单

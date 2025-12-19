@@ -2,7 +2,7 @@ import redis
 from fastapi import APIRouter, BackgroundTasks, Depends
 from app.schemas.monitor import VideoAnalyzeRequest
 from app.services.task_service import TaskService
-from server.app.core.database import get_redis
+from app.core.database import get_redis
 
 
 router = APIRouter()

@@ -108,9 +108,32 @@ def replay_danmaku(json_file: str, kafka_servers: list, topic: str, speed: float
         except Exception as e:
             print(f"发送失败: {e}")
 
+    print("重放结束")
+
+    print("强制关闭Flink窗口，推送关闭信号")
+    future_time = int(time.time() * 1000) + 60000
+
+    end_msg = {
+        "platform": "system",
+        "room_id": "system_flush",
+        "user": {
+            "id": "0",
+            "name": "system",
+        },
+        "content": "FLUSH",
+        "event_type": "danmaku",
+        "ts": future_time,
+    }
+
+    # 发送这条结束信号
+    try:
+        producer.send(topic, value=end_msg)
+        print(f"已发送FLUSH信号，时间戳: {future_time}")
+    except Exception as e:
+        print(f"FLUSH信号发送失败: {e}")
+
     producer.flush()
     producer.close()
-    print("重放结束")
 
 
 if __name__ == "__main__":

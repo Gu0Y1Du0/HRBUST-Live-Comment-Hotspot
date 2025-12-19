@@ -14,8 +14,12 @@ class Settings(BaseSettings):
 
     # 爬虫相关路径
     PYTHON_PATH: str = "/home/hadoop/HRBUST-Live-Comment-Hotspot/.venv/bin/python"
-    SCRIPT_LIVE: str = f"{SERVER_HOME}collector/bili-collector.py"
-    SCRIPT_VIDEO: str = f"{SERVER_HOME}collector/video_pipeline.py"
+    SCRIPT_LIVE_BILIBILI: str = "collector/bili-collector.py"
+    SCRIPT_VIDEO_BILIBILI: str = "collector/video_pipeline.py"
+    SCRIPT_LIVE_DOUYIN: str = ""
+    SCRIPT_VIDEO_DOUYIN: str = ""
+    SCRIPT_LIVE_DOUYU: str = ""
+    SCRIPT_VIDEO_DOUYU: str = ""
 
     class Config:
         env_file = ".env"
