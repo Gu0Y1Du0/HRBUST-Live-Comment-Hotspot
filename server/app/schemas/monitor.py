@@ -17,6 +17,7 @@ class VideoAnalyzeRequest(BaseModel):
 class RankItem(BaseModel):
     room_id: str
     heat: int
+    status: str
 
 
 # 历史趋势响应

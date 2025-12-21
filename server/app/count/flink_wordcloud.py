@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import jieba
@@ -12,6 +13,14 @@ from pyflink.datastream.connectors.kafka import (
 from pyflink.common import WatermarkStrategy, Duration, Types
 from pyflink.datastream.window import SlidingEventTimeWindows
 from pyflink.datastream.functions import ProcessWindowFunction
+from dotenv import load_dotenv
+
+# --- 配置 ---
+current_dir = os.path.dirname(os.path.dirname(__file__))
+env_path = os.path.join(current_dir, "../.env")
+load_dotenv(env_path)
+
+BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "hadoop01:9092")
 
 # 停用词表
 STOP_WORDS = {
@@ -64,7 +73,7 @@ def split_words(value):
     try:
         data = json.loads(value)
         room_id = str(data.get("room_id", "unknown"))
-        content = data.get("conntent", "")
+        content = data.get("content", "")
 
         # 结巴分词
         words = jieba.cut(content)
@@ -88,17 +97,22 @@ class TopNWordsFunction(ProcessWindowFunction):
 
     def process(self, key, context, elements):
         # key是room_id
-        room_id = key[0]  # key是tuple
+        if isinstance(key, tuple):
+            room_id = key[0]  # key是tuple
+        else:
+            room_id = str(key)
+
+        print(f"DEBUG: Processing window for room: {room_id}")
 
         # 本地统计词频
         word_count = {}
         for _, word in elements:
             word_count[word] = word_count.get(word, 0) + 1
 
-        # 排序取前Top30
+        # 排序取前Top380
         sorted_words = sorted(
             word_count.items(), key=lambda item: item[1], reverse=True
-        )[:30]
+        )[:380]
 
         # 转换成Echarts需要的格式
         result_list = [{"name": k, "value": v} for k, v in sorted_words]
@@ -121,7 +135,7 @@ env.set_parallelism(1)
 # Source
 kafka_source = (
     KafkaSource.builder()
-    .set_bootstrap_servers("hadoop01:9092")
+    .set_bootstrap_servers(BOOTSTRAP_SERVERS)
     .set_topics("danmaku_raw")
     .set_group_id("flink-wordcloud-group")
     .set_value_only_deserializer(SimpleStringSchema())
@@ -159,7 +173,7 @@ record_serializer = (
 
 kafka_sink = (
     KafkaSink.builder()
-    .set_bootstrap_servers("hadoop01:9092")
+    .set_bootstrap_servers(BOOTSTRAP_SERVERS)
     .set_record_serializer(record_serializer)
     .build()
 )

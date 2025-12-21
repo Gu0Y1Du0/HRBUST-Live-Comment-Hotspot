@@ -1,3 +1,7 @@
+import json
+import redis
+import logging
+import os
 from pyflink.common.time import Time
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.common.serialization import SimpleStringSchema
@@ -8,10 +12,13 @@ from pyflink.datastream.connectors.kafka import (
 from pyflink.common import WatermarkStrategy, Duration, Types
 from pyflink.datastream.window import TumblingEventTimeWindows, SlidingEventTimeWindows
 from pyflink.datastream.connectors.kafka import KafkaSink
+from dotenv import load_dotenv
 
-import json
-import redis
-import logging
+# --- 配置 ---
+current_dir = os.path.dirname(os.path.dirname(__file__))
+env_path = os.path.join(current_dir, "../.env")
+load_dotenv(env_path)
+BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "hadoop01:9092")
 
 
 def parse_json(value):
@@ -29,7 +36,7 @@ env.set_parallelism(1)
 # 设置Kafka源
 kafka_source = (
     KafkaSource.builder()
-    .set_bootstrap_servers("hadoop01:9092")
+    .set_bootstrap_servers(BOOTSTRAP_SERVERS)
     .set_topics("danmaku_raw")
     .set_group_id("flink-danmaku-count")
     .set_value_only_deserializer(SimpleStringSchema())
@@ -111,7 +118,7 @@ record_serializer = (
 # 暂时输出到kafka，后面改出到redis
 kafka_sink = (
     KafkaSink.builder()
-    .set_bootstrap_servers("hadoop01:9092")
+    .set_bootstrap_servers(BOOTSTRAP_SERVERS)
     .set_record_serializer(record_serializer=record_serializer)
     .build()
 )
