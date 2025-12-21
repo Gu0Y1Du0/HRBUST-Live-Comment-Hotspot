@@ -36,26 +36,31 @@ class TaskService:
             # 直接抛出异常
             raise HTTPException(status_code=400, detail=f"直播间{room_id}已经在监控中!")
 
+        if not str(room_id).isdigit():
+            raise HTTPException(status_code=400, detail=f"无效的直播房间号: {room_id}!")
+
         # 选择对应平台脚本(脚本写在core/config中)
         script_path = ""
         if platform == "bilibili":
-            script_path = settings.SCRIPT_LIVE_BILIBILI
+            script_path = settings.script_live_bilibili
         elif platform == "douyin":
-            script_path = settings.SCRIPT_LIVE_DOUYIN
+            script_path = settings.script_live_douyin
         elif platform == "douyu":
-            script_path = settings.SCRIPT_LIVE_DOUYU
+            script_path = settings.script_live_douyu
         else:
             raise HTTPException(status_code=400, detail=f"不支持平台: {platform}")
 
-        cmd = [settings.PYTHON_PATH, script_path, "--room-id", str(room_id)]
+        cmd = [settings.python_path, script_path, "--room-id", str(room_id)]
 
         try:
+            # 加锁防止双击
+            r.set(lock_key, "starting", ex=60)
+
             subprocess.Popen(cmd)
-            # 加锁
-            r.set(lock_key, "running")
 
             # 写入持久化配置
             # sadd: 向集合中添加元素，如果已存在就会自动忽略
+            r.set(lock_key, "running")
             r.sadd(config_key, config_value)
 
             print(f"[启动成功] {platform} - {room_id}")
@@ -65,7 +70,9 @@ class TaskService:
                 "message": f"{platform}直播监控已启动，房间号: {room_id}",
             }
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            r.delete(lock_key)
+            print(f"启动失败，回滚锁: {e}")
+            return HTTPException(status_code=500, detail=f"启动脚本失败: {e}")
 
     @staticmethod
     def start_video_replay(
@@ -84,8 +91,8 @@ class TaskService:
         r.set(lock_key, "running", ex=120)
 
         cmd = [
-            settings.PYTHON_PATH,
-            settings.SCRIPT_VIDEO_BILIBILI,
+            settings.python_path,
+            settings.script_video_bilibili,
             "--bv",
             str(bv_id),
             "--speed",

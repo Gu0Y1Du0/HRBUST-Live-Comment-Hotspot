@@ -28,13 +28,19 @@ echo ">> 正在启动后端 API (FastAPI)..."
 pm2 start server/run_backend.sh --name "backend-api"
 #   --interpreter-args "-m uvicorn server.app.main:app --host 0.0.0.0 --port 8000"
 
-echo ">> 正在启动 Flink 实时计算引擎..."
-pm2 start count/flink_danmaku_count.py \
-  --name "flink-engine" \
+echo ">> 正在启动Flink实时计算引擎..."
+echo ">> 正在启动弹幕流实时计算"
+pm2 start server/app/count/flink_danmaku_count.py \
+  --name "flink-engine-danmaku_count" \
+  --interpreter "$VENV_PYTHON"
+
+echo ">> 正在启动词云实时计算"
+pm2 start server/app/count/flink_wordcloud.py \
+  --name "flink-engine-danmaku_wordcloud" \
   --interpreter "$VENV_PYTHON"
 
 echo ">> 正在启动数据桥接 (Kafka -> Redis)..."
-pm2 start count/bridge_to_redis.py \
+pm2 start server/app/count/bridge_to_redis.py \
   --name "redis-bridge" \
   --interpreter "$VENV_PYTHON"
 
